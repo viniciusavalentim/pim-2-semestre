@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1729947732 source:c:\users\valen\onedrive\documentos\pim 2024\pim\main.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+
