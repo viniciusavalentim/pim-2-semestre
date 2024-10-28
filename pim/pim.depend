@@ -4,3 +4,11 @@
 	<string.h>
 	<stdlib.h>
 
+1730146552 source:c:\users\vinic\documents\dev\pim-2-semestre\pim\main.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<time.h>
+	<windows.h>
+	<conio.h>
+
