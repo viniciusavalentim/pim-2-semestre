@@ -4,6 +4,8 @@
 #include <time.h>
 #include <windows.h>
 #include <conio.h>
+#include <string.h>
+
 
 //SAO CONSTANTES QUE JA INICIAM COM UM TAMANHO FIXO DE PRODUTOS/FORNECEDORES
 #define MAX_PRODUTOS 100
@@ -200,6 +202,7 @@ void cadastrarProduto() {
     system("cls");
     exibirTituloPersonalizado(14, 11, "Cadastrar Produto");
     pegarCor(7);
+    char quite[50];
 
     if (numProdutos >= MAX_PRODUTOS) {
         printf("Limite de produtos atingido.\n");
@@ -207,18 +210,52 @@ void cadastrarProduto() {
     }
 
     produtos[numProdutos].id = numProdutos + 1;
+    printf("--> Caso queira sair digite 'q' ou 'Q' <--\n");
 
-    printf("Digite o nome do produto: ");
-    fgets(produtos[numProdutos].nome, sizeof(produtos[numProdutos].nome), stdin);
-
-    produtos[numProdutos].nome[strcspn(produtos[numProdutos].nome, "\n")] = 0;
-
-    printf("Digite o preco do produto (KG) R$ ");
-    while (scanf("%f", &produtos[numProdutos].preco) != 1) {
-        printf("Entrada inválida. Digite um número válido para o preço: ");
-        while (getchar() != '\n');
+    while (1) {
+        printf("Digite o nome do produto: ");
+        if (fgets(produtos[numProdutos].nome, sizeof(produtos[numProdutos].nome), stdin) != NULL) {
+            produtos[numProdutos].nome[strcspn(produtos[numProdutos].nome, "\n")] = '\0';
+            if (strcmp(produtos[numProdutos].nome, "q") == 0 || strcmp(produtos[numProdutos].nome, "Q") == 0) {
+                printf("Operacao cancelada pelo usuario.\n");
+                return;
+            }
+            if (strlen(produtos[numProdutos].nome) == 0) {
+                printf("Erro: o nome do produto nao pode estar vazio. Tente novamente.\n");
+            } else {
+                break;
+            }
+        } else {
+            printf("Entrada invalida. Tente novamente.\n");
+        }
     }
 
+    char entrada[20];
+    float preco;
+
+    printf("============================================\n");
+    printf("--> Caso queira sair digite 'q' ou 'Q' <--\n");
+    while (1) {
+        printf("Digite o preco do produto (KG) R$ ");
+        if (fgets(entrada, sizeof(entrada), stdin) != NULL) {
+            entrada[strcspn(entrada, "\n")] = '\0';
+            if (entrada[0] == 'q' || entrada[0] == 'Q') {
+                printf("Operação cancelada pelo usuario: ");
+                return;
+            }
+
+            if (sscanf(entrada, "%f", &preco) != 1) {
+                printf("Erro: Entrada invalida insira um numero: ");
+            } else if (preco < 0.1) {
+                printf("Erro: O preco deve ser maior ou igual a 0.1. Tente novamente.\n");
+            } else {
+                break;
+            }
+        } else {
+            printf("Erro ao ler a entrada Tente novamente.\n");
+        }
+    }
+    produtos[numProdutos].preco = preco;
     numProdutos++;
     printf("Produto cadastrado com sucesso!\n");
 }
@@ -232,8 +269,6 @@ void registrarEntradaProduto() {
         printf("Nenhum produto cadastrado.\n");
         return;
     }
-
-
     int id, quantidade;
     float preco;
     printf("---- Digite o ID do produto para registrar a entrada ----\n");
@@ -247,21 +282,96 @@ void registrarEntradaProduto() {
     }
     pegarCorEFundo(15, 0);
     printf("\n");
-    scanf("%d", &id);
+    char entrada[50];
 
-    if (id <= 0 || id > numProdutos || !id) {
-        printf("ID de produto invalido.\n");
-        return;
+    pegarCor(8);
+    printf("<-- Caso queira sair digite 'q' ou 'Q' -->\n");
+    pegarCor(15);
+
+    while (1) {
+        if (fgets(entrada, sizeof(entrada), stdin) != NULL) {
+            entrada[strcspn(entrada, "\n")] = '\0';
+            if (entrada[0] == 'q' || entrada[0] == 'Q') {
+                printf("Operacao cancelada pelo usuario.\n");
+                return 0;
+            }
+            if (sscanf(entrada, "%d", &id) != 1) {
+                printf("Erro: Entrada invalida insira um numero: ");
+            } else if (id <= 0) {
+                printf("Erro: O id deve ser maior ou igual a 1. Tente novamente: ");
+            } else if(id > numProdutos){
+                printf("Erro: Produto nao existe. Tente novamente: ");
+            }else{
+                break;
+            }
+        } else {
+            printf("Erro ao ler o id. Tente novamente: ");
+        }
     }
 
+    pegarCor(11);
+    printf("========== Fruta selecionada: %s ==========\n", produtos[id - 1].nome);
+    pegarCor(15);
+
     printf("Digite a quantidade a ser adicionada (em KG): ");
-    scanf("%d", &quantidade);
+    while (1) {
+        if (fgets(entrada, sizeof(entrada), stdin) != NULL) {
+            entrada[strcspn(entrada, "\n")] = '\0';
+            if (entrada[0] == 'q' || entrada[0] == 'Q') {
+                printf("Operacao cancelada pelo usuario.\n");
+                return 0;
+            }
+            if (sscanf(entrada, "%d", &quantidade) != 1) {
+                printf("Erro: Entrada invalida insira um numero: ");
+            } else if (quantidade <= 0) {
+                printf("Erro: A qauntidade deve ser maior ou igual a 1. Tente novamente: ");
+            } else {
+                break;
+            }
+        } else {
+            printf("Erro ao ler o quantidade. Tente novamente: ");
+        }
+    }
 
     printf("Digite o preco da entrada R$ ");
-    scanf("%f", &entradas[numEntradas].preco);
+    while (1) {
+        if (fgets(entrada, sizeof(entrada), stdin) != NULL) {
+            entrada[strcspn(entrada, "\n")] = '\0';
+            if (entrada[0] == 'q' || entrada[0] == 'Q') {
+                printf("Operacao cancelada pelo usuario.\n");
+                return 0;
+            }
+            if (sscanf(entrada, "%f", &entradas[numEntradas].preco) != 1) {
+                printf("Erro: Entrada invalida insira um numero: ");
+            } else if (entradas[numEntradas].preco <= 0) {
+                printf("Erro: O Preco deve ser maior ou igual a 1. Tente novamente: ");
+            } else {
+                break;
+            }
+        } else {
+            printf("Erro ao ler o Preco. Tente novamente: ");
+        }
+    }
 
     printf("Digite a data de validade (dd/mm/yyyy): ");
-    scanf("%10s", entradas[numEntradas].dataValidade);
+
+    while (1) {
+        if (fgets(entrada, sizeof(entrada), stdin) != NULL) {
+            entrada[strcspn(entrada, "\n")] = '\0';
+            if (entrada[0] == 'q' || entrada[0] == 'Q') {
+                printf("Operacao cancelada pelo usuario.\n");
+                return 0;
+            }
+            if (sscanf(entrada, "%10s", &entradas[numEntradas].dataValidade) != 1) {
+                printf("Erro: Entrada invalida insira um numero.\n");
+            } else {
+                break;
+            }
+
+        } else {
+            printf("Erro ao ler a data. Tente novamente: ");
+        }
+    }
 
     printf("\n---- Digite o ID do fornecedor ----\n");
     printf("Fornecedores cadastrados:\n");
@@ -272,7 +382,28 @@ void registrarEntradaProduto() {
         printf(" | Nome: %s | CNPJ: %s \n", fornecedores[i].nome, fornecedores[i].cnpj);
     }
     pegarCorEFundo(15, 0);
-    scanf("%d", &entradas[numEntradas].fornecedorId);
+
+    while (1) {
+        if (fgets(entrada, sizeof(entrada), stdin) != NULL) {
+            entrada[strcspn(entrada, "\n")] = '\0';
+            if (entrada[0] == 'q' || entrada[0] == 'Q') {
+                printf("Operacao cancelada pelo usuario.\n");
+                return 0;
+            }
+            if (sscanf(entrada, "%d", &entradas[numEntradas].fornecedorId) != 1) {
+                printf("Erro: Entrada invalida insira um numero: ");
+            } else if (entradas[numEntradas].fornecedorId <= 0 ) {
+                printf("Erro: o ID deve ser maior ou igual a 1. Tente novamente: ");
+            } else if (entradas[numEntradas].fornecedorId > numFornecedores ) {
+                printf("Erro: Fornecedor nao existe. Tente Novamente: ");
+            } else {
+                break;
+            }
+        } else {
+            printf("Erro ao ler o ID. Tente novamente: ");
+        }
+    }
+
 
     entradas[numEntradas].id = numEntradas + 1;
     strcpy(entradas[numEntradas].nome, produtos[id-1].nome);
@@ -339,19 +470,68 @@ void cadastrarFornecedor() {
         printf("Limite de fornecedores atingido.\n");
         return;
     }
+    char entrada[50];
 
+    pegarCorEFundo(0,9);
+    printf("--> Caso queira sair digite 'q' ou 'Q' <--\n");
+    pegarCorEFundo(15,9);
 
     printf("Digite o nome do fornecedor: ");
-    fgets(fornecedores[numFornecedores].nome, sizeof(fornecedores[numFornecedores].nome), stdin);
-    fornecedores[numFornecedores].nome[strcspn(fornecedores[numFornecedores].nome, "\n")] = 0;
+    while (1) {
+        if (fgets(fornecedores[numFornecedores].nome, sizeof(fornecedores[numFornecedores].nome), stdin) != NULL) {
+            fornecedores[numFornecedores].nome[strcspn(fornecedores[numFornecedores].nome, "\n")] = '\0';
+            if (strcmp(fornecedores[numFornecedores].nome, "q") == 0 || strcmp(fornecedores[numFornecedores].nome, "Q") == 0) {
+                printf("Operacao cancelada pelo usuario\n");
+                return;
+            }
+            if (strlen(fornecedores[numFornecedores].nome) == 0) {
+                printf("Erro: o nome do fornecedor nao pode estar vazio. Tente novamente: ");
+            } else {
+                break;
+            }
+        } else {
+            printf("Entrada invalida. Tente novamente.\n");
+        }
+    }
+
 
     printf("Digite o contato do fornecedor: ");
-    fgets(fornecedores[numFornecedores].contato, sizeof(fornecedores[numFornecedores].contato), stdin);
-    fornecedores[numFornecedores].contato[strcspn(fornecedores[numFornecedores].contato, "\n")] = 0;
+    while (1) {
+        if (fgets(fornecedores[numFornecedores].contato, sizeof(fornecedores[numFornecedores].contato), stdin) != NULL) {
+            fornecedores[numFornecedores].contato[strcspn(fornecedores[numFornecedores].contato, "\n")] = '\0';
+            if (strcmp(fornecedores[numFornecedores].contato, "q") == 0 || strcmp(fornecedores[numFornecedores].contato, "Q") == 0) {
+                printf("Operacao cancelada pelo usuario\n");
+                return;
+            }
+            if (strlen(fornecedores[numFornecedores].contato) == 0) {
+                printf("Erro: o contato do fornecedor nao pode estar vazio. Tente novamente: ");
+            } else {
+                break;
+            }
+        } else {
+            printf("Entrada invalida. Tente novamente.\n");
+        }
+    }
+
 
     printf("Digite o CNPJ do fornecedor(XX.XXX.XXX/0001-XX): ");
-    fgets(fornecedores[numFornecedores].cnpj, sizeof(fornecedores[numFornecedores].cnpj), stdin);
-    fornecedores[numFornecedores].cnpj[strcspn(fornecedores[numFornecedores].cnpj, "\n")] = 0;
+    while (1) {
+        if (fgets(fornecedores[numFornecedores].cnpj, sizeof(fornecedores[numFornecedores].cnpj), stdin) != NULL) {
+            fornecedores[numFornecedores].cnpj[strcspn(fornecedores[numFornecedores].cnpj, "\n")] = '\0';
+            if (strcmp(fornecedores[numFornecedores].cnpj, "q") == 0 || strcmp(fornecedores[numFornecedores].cnpj, "Q") == 0) {
+                printf("Operacao cancelada pelo usuario\n");
+                return;
+            }
+            if (strlen(fornecedores[numFornecedores].cnpj) == 0) {
+                printf("Erro: o cnpj do fornecedor nao pode estar vazio. Tente novamente: ");
+            } else {
+                break;
+            }
+        } else {
+            printf("Entrada invalida. Tente novamente.\n");
+        }
+    }
+
 
     fornecedores[numFornecedores].id = numFornecedores + 1;
     fornecedores[numFornecedores].totalEntregas = 0;
