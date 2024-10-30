@@ -197,6 +197,8 @@ void exibirTituloEFundo(int corTexto,int corBarra, int fundo, char texto[250]) {
 
 
 
+
+
 //FUNCOES DESENVOLVIDAS PARA SEREM USADAS NAS GESTOES DOS PRODUTOS
 void cadastrarProduto() {
     system("cls");
@@ -240,7 +242,7 @@ void cadastrarProduto() {
         if (fgets(entrada, sizeof(entrada), stdin) != NULL) {
             entrada[strcspn(entrada, "\n")] = '\0';
             if (entrada[0] == 'q' || entrada[0] == 'Q') {
-                printf("Operação cancelada pelo usuario: ");
+                printf("Operacao cancelada pelo usuario: ");
                 return;
             }
 
@@ -418,27 +420,69 @@ void registrarEntradaProduto() {
 void registrarSaidaProduto() {
     alterarCorConsole("4F");
     system("cls");
-    printf("Registro de Saida de Produto:\n");
+    printf("Registro de Saída de Produto:\n");
+
+    if (numProdutos == 0) {
+        printf("Nenhum produto cadastrado.\n");
+        return;
+    }
 
     int id, quantidade;
-    printf("Digite o ID do produto para registrar a saida: ");
-    scanf("%d", &id);
+    char entrada[50];
 
-    if (id <= 0 || id > numProdutos) {
-        printf("ID de produto invalido.\n");
-        return;
+    printf("Produtos cadastrados:\n");
+    for (int i = 0; i < numProdutos; i++) {
+        printf("ID: %d | Nome: %s | Quantidade: %d\n", produtos[i].id, produtos[i].nome, produtos[i].quantidade);
     }
 
-    printf("Digite a quantidade a ser removida: ");
-    scanf("%d", &quantidade);
-
-    if (produtos[id-1].quantidade < quantidade) {
-        printf("Quantidade insuficiente em estoque.\n");
-        return;
+    while (1) {
+        printf("Digite o ID do produto para registrar a saída: ");
+        if (fgets(entrada, sizeof(entrada), stdin) != NULL) {
+            entrada[strcspn(entrada, "\n")] = '\0';
+            if (entrada[0] == 'q' || entrada[0] == 'Q') {
+                printf("Operação cancelada pelo usuário.\n");
+                return;
+            }
+            if (sscanf(entrada, "%d", &id) != 1 || id <= 0 || id > numProdutos) {
+                printf("ID de produto inválido. Tente novamente.\n");
+            } else {
+                break;
+            }
+        }
     }
 
-    produtos[id-1].quantidade -= quantidade;
-    printf("Saida registrada com sucesso!\n");
+    while (1) {
+        printf("Digite a quantidade a ser removida: ");
+        if (fgets(entrada, sizeof(entrada), stdin) != NULL) {
+            entrada[strcspn(entrada, "\n")] = '\0';
+            if (entrada[0] == 'q' || entrada[0] == 'Q') {
+                printf("Operação cancelada pelo usuário.\n");
+                return;
+            }
+            if (sscanf(entrada, "%d", &quantidade) != 1 || quantidade <= 0) {
+                printf("Quantidade inválida. Deve ser um número maior que zero. Tente novamente.\n");
+            } else if (produtos[id - 1].quantidade < quantidade) {
+                printf("Quantidade insuficiente em estoque. Disponível: %d\n", produtos[id - 1].quantidade);
+            } else {
+                break;
+            }
+        }
+    }
+
+    strcpy(saidas[numSaidas].nome, produtos[id - 1].nome);
+    saidas[numSaidas].idProduto = id;
+    saidas[numSaidas].quantidade = quantidade;
+    saidas[numSaidas].precoTotal = 0;
+
+    char dataSaida[11];
+    obterDataDeEntrada(dataSaida);
+    strcpy(saidas[numSaidas].dataDeSaida, dataSaida);
+
+    produtos[id - 1].quantidade -= quantidade;
+    saidas[numSaidas].id = numSaidas + 1;
+    numSaidas++;
+
+    printf("Saída registrada com sucesso!\n");
 }
 
 void gerarAlertas() {
@@ -446,12 +490,34 @@ void gerarAlertas() {
     system("cls");
     printf("Alertas de produtos proximos do vencimento e com estoque critico:\n");
 
+    time_t currentTime = time(NULL);
+    struct tm *currentDate = localtime(&currentTime);
+
+    char currentDateStr[11];
+    strftime(currentDateStr, sizeof(currentDateStr), "%d/%m/%Y", currentDate);
+
     for (int i = 0; i < numEntradas; i++) {
         if (produtos[i].quantidade < 5) {
             printf("Estoque baixo: Produto %s (ID: %d) - Quantidade: %d\n", produtos[i].nome, produtos[i].id, produtos[i].quantidade);
         }
-        if (strcmp(entradas[i].dataValidade, "01/01/2025") == 0) {
-            printf("Produto %s (ID: %d) esta proximo do vencimento.\n", produtos[i].nome, produtos[i].id);
+
+        struct tm validadeDate = {0};
+        sscanf(entradas[i].dataValidade, "%d/%d/%d", &validadeDate.tm_mday, &validadeDate.tm_mon, &validadeDate.tm_year);
+        validadeDate.tm_mon -= 1;
+        validadeDate.tm_year -= 1900;
+
+        time_t validadeTime = mktime(&validadeDate);
+
+        if (difftime(validadeTime, currentTime) <= 0) {
+            printf("Produto %s (ID: %d) está vencido.\n", produtos[i].nome, produtos[i].id);
+        } else {
+            struct tm proximaData = *currentDate;
+            proximaData.tm_mday += 7;
+            mktime(&proximaData);
+
+            if (difftime(validadeTime, mktime(&proximaData)) <= 0) {
+                printf("Produto %s (ID: %d) está próximo do vencimento.\n", produtos[i].nome, produtos[i].id);
+            }
         }
     }
 }
