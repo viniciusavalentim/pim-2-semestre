@@ -102,8 +102,8 @@ Fornecedor fornecedores[MAX_FORNECEDORES] = {
 };
 
 Entradas entradas[MAX_PRODUTOS] = {
-    {1, "Maca", 2000, 10, "10/12/2024", "28/10/2024", 1},
-    {2, "Maca", 3000, 15, "30/12/2024", "27/10/2024", 1}
+    {1, "Maca", 2000, 10, "10/12/2024", "28/10/2023", 1},
+    {2, "Maca", 3000, 15, "30/12/2024", "27/10/2023", 1}
 };
 
 Saidas saidas[MAX_SAIDAS] = {
@@ -121,16 +121,7 @@ int numSaidas = 2;
 
 
 //FUNCOES DESENVOILVIDAS PARA SEREM USADAS GLOBALEMNTE (TODO)
-void alterarCorConsole(const char *codigoCor) {
-    char comando[10];
-    snprintf(comando, sizeof(comando), "color %s", codigoCor);
-    system(comando);
-}
 
-void configurarTelaPrincipal() {
-    system("cls");
-    alterarCorConsole("0F");
-}
 
 void obterDataDeEntrada(char* dataAtual) {
     time_t agora = time(NULL);
@@ -138,21 +129,8 @@ void obterDataDeEntrada(char* dataAtual) {
     strftime(dataAtual, 11, "%d/%m/%Y", tempoLocal);
 }
 
-void pegarCor(int color) {
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
-}
-
-void pegarCorEFundo(int textColor, int bgColor) {
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), textColor | (bgColor << 4));
-}
-
-void definirCorDeFundo(int corFundo) {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
-        int cor = (csbi.wAttributes & 0x0F) | (corFundo << 4);
-        SetConsoleTextAttribute(hConsole, cor);
-    }
+void configurarTelaPrincipal() {
+    system("cls");
 }
 
 void carregarAnimacao() {
@@ -166,36 +144,24 @@ void carregarAnimacao() {
 
 void exibirTitulo() {
     system("cls");
-    pegarCor(11);
     printf("\n==========================");
-    pegarCor(14);
     printf("  Bem vindo ao Little Bird  ");
-    pegarCor(11);
     printf("==========================\n\n");
 }
 
 void exibirTituloPersonalizado(int corTexto,int corBarra, char texto[250]) {
     system("cls");
-    pegarCor(corBarra);
     printf("\n==========================");
-    pegarCor(corTexto);
     printf(" %s ", texto);
-    pegarCor(corBarra);
     printf("==========================\n\n");
 }
 
 void exibirTituloEFundo(int corTexto,int corBarra, int fundo, char texto[250]) {
     system("cls");
-    pegarCorEFundo(corBarra, fundo);
     printf("\n==========================");
-    pegarCorEFundo(corTexto, fundo);
     printf(" %s ", texto);
-    pegarCorEFundo(corBarra, fundo);
     printf("==========================\n\n");
 }
-
-
-
 
 
 
@@ -203,17 +169,13 @@ void exibirTituloEFundo(int corTexto,int corBarra, int fundo, char texto[250]) {
 void cadastrarProduto() {
     system("cls");
     exibirTituloPersonalizado(14, 11, "Cadastrar Produto");
-    pegarCor(7);
     char quite[50];
-
     if (numProdutos >= MAX_PRODUTOS) {
         printf("Limite de produtos atingido.\n");
         return;
     }
-
     produtos[numProdutos].id = numProdutos + 1;
     printf("--> Caso queira sair digite 'q' ou 'Q' <--\n");
-
     while (1) {
         printf("Digite o nome do produto: ");
         if (fgets(produtos[numProdutos].nome, sizeof(produtos[numProdutos].nome), stdin) != NULL) {
@@ -231,10 +193,8 @@ void cadastrarProduto() {
             printf("Entrada invalida. Tente novamente.\n");
         }
     }
-
     char entrada[20];
     float preco;
-
     printf("============================================\n");
     printf("--> Caso queira sair digite 'q' ou 'Q' <--\n");
     while (1) {
@@ -265,7 +225,7 @@ void cadastrarProduto() {
 void registrarEntradaProduto() {
     system("cls");
     exibirTituloPersonalizado(14, 11, "Registrar Entrada do produto");
-    pegarCor(7);
+
 
     if (numProdutos == 0) {
         printf("Nenhum produto cadastrado.\n");
@@ -277,18 +237,17 @@ void registrarEntradaProduto() {
 
     printf("Produtos cadastrados:\n");
     for (int i = 0; i < numProdutos; i++) {
-        pegarCorEFundo(11, 0);
+
         printf(" ID: %d", produtos[i].id);
-        pegarCorEFundo(8, 0);
+
         printf(" | Nome: %s \n", produtos[i].nome);
     }
-    pegarCorEFundo(15, 0);
+
     printf("\n");
     char entrada[50];
 
-    pegarCor(8);
+
     printf("<-- Caso queira sair digite 'q' ou 'Q' -->\n");
-    pegarCor(15);
 
     while (1) {
         if (fgets(entrada, sizeof(entrada), stdin) != NULL) {
@@ -311,9 +270,7 @@ void registrarEntradaProduto() {
         }
     }
 
-    pegarCor(11);
     printf("========== Fruta selecionada: %s ==========\n", produtos[id - 1].nome);
-    pegarCor(15);
 
     printf("Digite a quantidade a ser adicionada (em KG): ");
     while (1) {
@@ -378,12 +335,11 @@ void registrarEntradaProduto() {
     printf("\n---- Digite o ID do fornecedor ----\n");
     printf("Fornecedores cadastrados:\n");
     for (int i = 0; i < numFornecedores; i++) {
-        pegarCorEFundo(11, 0);
+
         printf(" ID: %d", fornecedores[i].id);
-        pegarCorEFundo(8, 0);
         printf(" | Nome: %s | CNPJ: %s \n", fornecedores[i].nome, fornecedores[i].cnpj);
     }
-    pegarCorEFundo(15, 0);
+
 
     while (1) {
         if (fgets(entrada, sizeof(entrada), stdin) != NULL) {
@@ -406,7 +362,6 @@ void registrarEntradaProduto() {
         }
     }
 
-
     entradas[numEntradas].id = numEntradas + 1;
     strcpy(entradas[numEntradas].nome, produtos[id-1].nome);
     entradas[numEntradas].quantidade = quantidade;
@@ -418,7 +373,6 @@ void registrarEntradaProduto() {
 }
 
 void registrarSaidaProduto() {
-    alterarCorConsole("4F");
     system("cls");
     printf("Registro de Saída de Produto:\n");
 
@@ -486,7 +440,7 @@ void registrarSaidaProduto() {
 }
 
 void gerarAlertas() {
-    alterarCorConsole("6F");
+
     system("cls");
     printf("Alertas de produtos proximos do vencimento e com estoque critico:\n");
 
@@ -523,13 +477,13 @@ void gerarAlertas() {
 }
 
 void cadastrarFornecedor() {
-    definirCorDeFundo(9);
+
     system("cls");
-    pegarCorEFundo(15, 9);
+
     printf("\n==========================");
-    pegarCorEFundo(15, 9);
+
     printf(" Cadastrar Fornecedor ");
-    pegarCorEFundo(15, 9);
+
     printf("==========================\n\n");
 
     if (numFornecedores >= MAX_FORNECEDORES) {
@@ -538,9 +492,9 @@ void cadastrarFornecedor() {
     }
     char entrada[50];
 
-    pegarCorEFundo(0,9);
+
     printf("--> Caso queira sair digite 'q' ou 'Q' <--\n");
-    pegarCorEFundo(15,9);
+
 
     printf("Digite o nome do fornecedor: ");
     while (1) {
@@ -614,15 +568,13 @@ void cadastrarFornecedor() {
 //FUNCOES DESENVOLVIDAS PARA OS RELATORIOS
 void relatorioProdutos() {
     system("cls");
-    definirCorDeFundo(15);
     exibirTituloEFundo(9, 9, 15, "Relatorio de Produtos");
-    pegarCorEFundo(8, 15);
 
     for (int i = 0; i < numProdutos; i++) {
 
-        pegarCorEFundo(0, 15);
+
         printf(" Nome: %s | ",  produtos[i].nome);
-        pegarCorEFundo(8, 15);
+
         printf("ID: %d | Preco: %.2f | Quantidade: %d \n",
                produtos[i].id, produtos[i].preco, produtos[i].quantidade);
     }
@@ -630,20 +582,20 @@ void relatorioProdutos() {
 
 void relatorioFornecedores() {
     system("cls");
-    definirCorDeFundo(15);
+
     exibirTituloEFundo(13, 13, 15, "Relatorio de Fornecedores");
-    pegarCorEFundo(8, 15);
+
 
 
     for (int i = 0; i < numFornecedores; i++) {
-        pegarCorEFundo(0, 15);
+
         printf("\n==========================");
-        pegarCorEFundo(0, 15);
+
         printf(" Nome: %s ", fornecedores[i].nome);
-        pegarCorEFundo(0, 15);
+
         printf("==========================\n\n");
 
-        pegarCorEFundo(8, 15);
+
         printf("ID: %d | Contato: %s | CNPJ: %s \n",
                 fornecedores[i].id, fornecedores[i].contato, fornecedores[i].cnpj);
         printf("        Total Entregas: %d | Entregas com Atraso: %d | Problemas de Qualidade: %d\n",
@@ -653,23 +605,16 @@ void relatorioFornecedores() {
 
 void relatorioEntradas() {
     system("cls");
-    definirCorDeFundo(15);
     exibirTituloEFundo(2, 2, 15, "Relatorio de Entradas");
-    pegarCorEFundo(8, 15);
-
     if(numEntradas < 0 || !numEntradas){
         printf("Nao existem entradas esse mes!\n");
         return;
     }
 
     for (int i = 0; i < numEntradas; i++) {
-        pegarCorEFundo(0, 15);
         printf("\n==========================");
-        pegarCorEFundo(0, 15);
         printf(" Nome: %s ", entradas[i].nome);
-        pegarCorEFundo(0, 15);
         printf("==========================\n\n");
-        pegarCorEFundo(8, 15);
 
         printf("Preco: R$ %.2f | Quantidade: %d KG | Data de Entrada: %s | Data de Validade: %s\n",
                 entradas[i].preco, entradas[i].quantidade, entradas[i].dataDeEntrada, entradas[i].dataValidade);
@@ -678,20 +623,13 @@ void relatorioEntradas() {
 
 void relatorioSaidas() {
     system("cls");
-    definirCorDeFundo(15);
     exibirTituloEFundo(12, 12, 15, "Relatorio de saidas");
-    pegarCorEFundo(8, 15);
 
 
     for (int i = 0; i < numSaidas; i++) {
-        pegarCorEFundo(0, 15);
         printf("\n==========================");
-        pegarCorEFundo(0, 15);
         printf(" ID: %d ", saidas[i].id);
-        pegarCorEFundo(0, 15);
         printf("==========================\n\n");
-        pegarCorEFundo(8, 15);
-
         printf("Id do produto: %d | Nome do produto: %s || Preco: R$ %.2f\n",
                 saidas[i].idProduto, saidas[i].nome, saidas[i].precoTotal);
         printf("        Quantidade: %d | Data da saida: %s \n",
@@ -721,16 +659,16 @@ void menu() {
     do {
         exibirTitulo();
         printf("--- Menu de Controle de Estoque ---\n");
-        pegarCor(7);
+
         for (int i = 0; i < 10; i++) {
             if (i == opcao) {
-                pegarCor(14);
+
                 printf("-> ");
             } else {
                 printf("   ");
             }
             printf("%d. %s\n", i + 1, menuOptions[i]);
-            pegarCor(7);
+
         }
         printf("\nUse as setas para navegar e Enter para selecionar.\n");
 
@@ -777,18 +715,18 @@ void menu() {
                     break;
                 case 10:
                     printf("Saindo do sistema...\n");
+                    return;
                     break;
                 default:
                     printf("Opcao invalida.\n");
             }
-            if (opcao != 9) {
+            if (opcao != 10) {
                 printf("\nPressione qualquer tecla para continuar...");
                 getchar();
                 getchar();
-                alterarCorConsole("0F");
             }
         }
-    } while(opcao != 9);
+    } while(opcao != 10);
 }
 
 int main() {
